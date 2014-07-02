@@ -13,9 +13,13 @@ import android.provider.Telephony;
 import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.example.smsstuff.SMSBroadcastReceiver.DatabaseInsertListener;
+import com.example.smsstuff.util.Utils.ThreadItem;
 
 public class MainActivity extends Activity{
 	
@@ -33,20 +37,14 @@ public class MainActivity extends Activity{
 	}
 	
 	@Override
-	protected void onResume() {		
-		boolean isDefault = isSmsEnabled();
-		
-//		if(!isDefault){
-//			Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
-//			intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, getPackageName());
-//			startActivity(intent);
-//		}		
-		
+	protected void onResume() {
 		super.onResume();
 		
-		receiver = new SMSBroadcastReceiver();
-		this.registerReceiver(receiver, new IntentFilter("android.provider.Telephony.SMS_DELIVER"));
-		this.receiver.setListener(new ViewUpdateListener());
+		if(receiver==null){
+			receiver = new SMSBroadcastReceiver();
+			this.registerReceiver(receiver, new IntentFilter("android.provider.Telephony.SMS_DELIVER"));
+			this.receiver.setListener(new ViewUpdateListener());
+		}
 	}
 	
 	public void registerBroadcastReceiver(Context context){
@@ -62,6 +60,7 @@ public class MainActivity extends Activity{
 	public void initListView(){
 		mListView = (ListView)this.findViewById(R.id.lvConversations);
 		mListView.setAdapter(mThreadAdapter = new TextMessageThreadAdapter(getApplicationContext()));
+		mListView.setOnItemClickListener(new onListItemSelect());
 	}
 
 	@Override
@@ -113,6 +112,21 @@ public class MainActivity extends Activity{
 		
 		manager.notify(0, builder.build());
 		
+	}
+	
+	public class onListItemSelect implements OnItemClickListener{
+
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			ThreadItem item = (ThreadItem)mThreadAdapter.getItem(position);
+			
+			Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
+			intent.putExtra("thread_id", item.thread_id);
+			intent.putExtra("address", item.address);
+			intent.putExtra("name", item.name);
+			MainActivity.this.startActivity(intent);
+		}
 	}
 	
 	public class ViewUpdateListener implements DatabaseInsertListener{

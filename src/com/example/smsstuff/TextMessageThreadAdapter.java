@@ -79,7 +79,7 @@ public class TextMessageThreadAdapter extends BaseAdapter{
 		
 		if(convertView == null){
 			LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			mView = inflater.inflate(R.layout.text_message_adapter, null);
+			mView = inflater.inflate(R.layout.conversation_adapter, null);
 		}else{
 			mView = convertView;
 		}
@@ -89,6 +89,7 @@ public class TextMessageThreadAdapter extends BaseAdapter{
 		TextView tvMsg = (TextView)mView.findViewById(R.id.textView2);
 		
 		String name = Utils.getContactIDFromPhoneNumber(context, threads[position].address);
+		threads[position].name = name;
 		String snip = threads[position].body;
 		
 		image.setImageResource(R.drawable.ic_launcher);
@@ -103,7 +104,7 @@ public class TextMessageThreadAdapter extends BaseAdapter{
 		this.notifyDataSetChanged();
 	}
 	
-	public class ConversationQueryHandler implements AsyncCursorListener{
+	private class ConversationQueryHandler implements AsyncCursorListener{
 
 		@Override
 		public void onQueryCompleted(int token, Cursor cursor) {

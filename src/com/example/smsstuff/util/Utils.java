@@ -26,9 +26,9 @@ public class Utils {
 				null, null, null);
 		
 		if(cursor!=null && cursor.moveToFirst()){
-			try{
-				return cursor.getString(0);
-			}finally{
+				try{
+					return cursor.getString(0);
+				}finally{
 				cursor.close();
 			}
 		}
@@ -36,6 +36,29 @@ public class Utils {
 		return PhoneNumberUtils.formatNumber(address);		
 	}
 	
+	public static MessageItem[] mergeMessages(MessageItem[] inbox, MessageItem[] sentbox){
+		MessageItem[] mergeList = new MessageItem[inbox.length+sentbox.length];
+		int left = 0;
+		int right = 0;
+		int index = 0;
+		
+		while(left < inbox.length && right < sentbox.length){
+			if(Long.parseLong(inbox[left].date) < Long.parseLong(sentbox[right].date))
+				mergeList[index++] = inbox[left++];
+			else
+				mergeList[index++] = sentbox[right++];	
+		}
+		
+		while(left < inbox.length){
+			mergeList[index++] = inbox[left++];
+		}
+		
+		while(right < sentbox.length){
+			mergeList[index++] = sentbox[right++];
+		}
+		
+		return mergeList;
+	}
 	public static boolean isMMS(MessageItem item){
 		return MMS_IDENTIFIER.equals(item.ct_t);
 	}
@@ -45,6 +68,7 @@ public class Utils {
 		public String thread_id;
 		public String address;
 		public String body;
+		public String name;
 		
 		public ThreadItem(String id, String thread_id, String address, String body) {
 			super();
@@ -56,6 +80,8 @@ public class Utils {
 	}
 	
 	public static class MessageItem{
+		
+		public boolean isMine;
 		public String id;
 		public String thread_id;
 		public String address;
