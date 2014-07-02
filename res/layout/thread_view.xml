@@ -1,9 +1,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
+    android:background="#FFFFFF"
     android:layout_height="fill_parent" >
 
     <TextView
         android:id="@+id/tvContact"
+        android:background="#FFFFFF"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -13,17 +15,17 @@
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge" />
     
-    <View
-        android:layout_below="@id/tvContact"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@drawable/black_white_gradient" />
+   
     
     <LinearLayout 
+        
         android:id="@+id/llContainer"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:background="#FFFFFF"
         >
         
         <EditText 
@@ -46,11 +48,20 @@
     </LinearLayout>
     
     <ListView
+        
         android:id="@+id/lvMessages"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/llContainer"
         android:layout_below="@id/tvContact"
+        android:divider="@null"
+        android:dividerHeight="0dp"
         />
+    
+     <View
+        android:layout_below="@id/tvContact"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/black_white_gradient" />
 
 </RelativeLayout>

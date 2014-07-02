@@ -110,7 +110,7 @@ public class ConversationThreadAdapter extends BaseAdapter{
 		msg.setText(messages[position].body);
 		msg.setGravity(isMine?Gravity.RIGHT:Gravity.LEFT);
 		msg.setTextColor(isMine?Color.GRAY:Color.BLACK);
-		msg.setPadding(isMine?200:10, 5, isMine?10:200, 5);
+		msg.setPadding(isMine?250:100, 15, isMine?100:250, 15);
 		
 		return mView;
 	}
