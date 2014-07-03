@@ -1,10 +1,13 @@
 package com.example.smsstuff;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +42,6 @@ public class ConversationThreadAdapter extends BaseAdapter{
 	}
 	
 	public void refreshData(){
-		Log.d(TAG, "refreshData()");
 		initCursor();		
 		getConversations();
 	}

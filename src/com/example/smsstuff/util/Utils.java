@@ -1,5 +1,10 @@
 package com.example.smsstuff.util;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -38,27 +43,24 @@ public class Utils {
 	
 	public static MessageItem[] mergeMessages(MessageItem[] inbox, MessageItem[] sentbox){
 		MessageItem[] mergeList = new MessageItem[inbox.length+sentbox.length];
-		int left = 0;
-		int right = 0;
-		int index = 0;
 		
-		while(left < inbox.length && right < sentbox.length){
-			if(Long.parseLong(inbox[left].date) < Long.parseLong(sentbox[right].date))
-				mergeList[index++] = inbox[left++];
-			else
-				mergeList[index++] = sentbox[right++];	
-		}
+		System.arraycopy(inbox, 0, mergeList, 0, inbox.length);
+		System.arraycopy(sentbox, 0, mergeList, inbox.length, sentbox.length);
 		
-		while(left < inbox.length){
-			mergeList[index++] = inbox[left++];
-		}
+		List<MessageItem> list = Arrays.asList(mergeList);
 		
-		while(right < sentbox.length){
-			mergeList[index++] = sentbox[right++];
-		}
+		Collections.sort(list, new Comparator<MessageItem>(){
+			@Override
+			public int compare(MessageItem lhs, MessageItem rhs) {
+				Long lhsDate = Long.valueOf(Long.parseLong(lhs.date));
+				Long rhsDate = Long.valueOf(Long.parseLong(rhs.date));
+				return lhsDate.compareTo(rhsDate);
+			}
+		});
 		
-		return mergeList;
+		return list.toArray(new MessageItem[list.size()]);
 	}
+
 	public static boolean isMMS(MessageItem item){
 		return MMS_IDENTIFIER.equals(item.ct_t);
 	}
