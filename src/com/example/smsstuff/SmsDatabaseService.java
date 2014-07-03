@@ -11,9 +11,9 @@ import android.provider.Telephony.Sms;
 import android.provider.Telephony.Sms.Inbox;
 import android.telephony.SmsMessage;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.example.smsstuff.util.Utils;
+import com.example.smsstuff.util.Utils.MessageItem;
 
 public class SmsDatabaseService extends Service{
 
@@ -30,10 +30,20 @@ public class SmsDatabaseService extends Service{
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		// TODO Auto-generated method stub
-		Log.d("SmsDatabaseService", "received intent, service started");
-		SmsMessage[] msg = Sms.Intents.getMessagesFromIntent(intent);
-		this.pushSmsToDatabase(msg);
+		
+		boolean isMine = intent.getBooleanExtra("isMine", false);
+		
+		if(isMine){
+			MessageItem message = new MessageItem();
+			message.thread_id = intent.getStringExtra("thread_id");
+			message.address = intent.getStringExtra("address");
+			message.body = intent.getStringExtra("body");
+			
+			pushSentSmsToDatabase(message, isMine);
+		}else{
+			SmsMessage[] msg = Sms.Intents.getMessagesFromIntent(intent);
+			this.pushSmsToDatabase(msg, isMine);
+		}
 		return super.onStartCommand(intent, flags, startId);
 	}
 
@@ -43,7 +53,7 @@ public class SmsDatabaseService extends Service{
 		super.onDestroy();
 	}
 	
-	public void pushSmsToDatabase(SmsMessage[] msg){
+	public void pushSmsToDatabase(SmsMessage[] msg, boolean isMine){
 		ContentValues values = extractContentValues(msg[0]);
 		
 		if(msg.length == 1){
@@ -55,19 +65,32 @@ public class SmsDatabaseService extends Service{
 			}
 		}
 		
-		Long threadId = values.getAsLong(Sms.THREAD_ID);
 		String address = values.getAsString(Sms.ADDRESS);
 		
 		if(TextUtils.isEmpty(address)){
 			address = "0000000000";
 		}
-		
-		values.put(Sms.THREAD_ID, threadId);
 		values.put(Sms.ADDRESS, address);
-		
-		getApplicationContext().getContentResolver().insert(Utils.SMS_INBOX_URI, values);
+		getApplicationContext().getContentResolver().insert(isMine?Utils.SMS_SENT_URI:Utils.SMS_INBOX_URI, values);
 		SMSBroadcastReceiver.finishDatabaseService(Utils.getContactIDFromPhoneNumber(getApplicationContext(), address));
 		this.stopSelf();
+	}
+	
+	public void pushSentSmsToDatabase(MessageItem message, boolean isMine){
+		ContentValues values = new ContentValues();
+		
+		values.put(Sms.Sent.BODY, message.body);
+		values.put(Sms.THREAD_ID, message.thread_id);
+		values.put(Sms.ADDRESS, message.address);
+		values.put(Sms.DATE, System.currentTimeMillis());
+		values.put(Sms.DATE_SENT, System.currentTimeMillis());
+		
+		getApplicationContext().getContentResolver().insert(isMine?Utils.SMS_SENT_URI:Utils.SMS_INBOX_URI, values);
+		if(isMine){
+			ConversationActivity.databaseServiceFinished(message.address);
+		}else{
+			SMSBroadcastReceiver.finishDatabaseService(Utils.getContactIDFromPhoneNumber(getApplicationContext(), message.address));
+		}
 	}
 	
 	private ContentValues extractContentValues(SmsMessage sms) {
@@ -91,7 +114,7 @@ public class SmsDatabaseService extends Service{
             now = sms.getTimestampMillis();
         }
 
-        values.put(Inbox.DATE, new Long(now));
+        values.put(Inbox.DATE, Long.valueOf(now));
         values.put(Inbox.DATE_SENT, Long.valueOf(sms.getTimestampMillis()));
         values.put(Inbox.PROTOCOL, sms.getProtocolIdentifier());
         values.put(Inbox.READ, 0);

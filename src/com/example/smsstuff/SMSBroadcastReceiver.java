@@ -21,6 +21,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver{
 		if(bundle!=null){
 			intent.setClass(context, SmsDatabaseService.class);
 			intent.putExtra("result", getResultCode());
+			intent.putExtra("isMine", false);
 			startDatabaseService(context, intent);
 		}
 	}
@@ -35,6 +36,6 @@ public class SMSBroadcastReceiver extends BroadcastReceiver{
 	
 	public static void finishDatabaseService(String contact){
 		final DatabaseInsertListener listener = mListener.get();
-		listener.dataHasBeenInserted(contact);
+		if(listener!=null)listener.dataHasBeenInserted(contact);
 	}
 }

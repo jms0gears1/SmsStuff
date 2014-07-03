@@ -32,8 +32,6 @@ public class MainActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		initListView();		
 	}
 	
 	@Override
@@ -45,6 +43,7 @@ public class MainActivity extends Activity{
 			this.registerReceiver(receiver, new IntentFilter("android.provider.Telephony.SMS_DELIVER"));
 			this.receiver.setListener(new ViewUpdateListener());
 		}
+		initListView();	
 	}
 	
 	public void registerBroadcastReceiver(Context context){
@@ -129,7 +128,7 @@ public class MainActivity extends Activity{
 		}
 	}
 	
-	public class ViewUpdateListener implements DatabaseInsertListener{
+	private class ViewUpdateListener implements DatabaseInsertListener{
 		@Override
 		public void dataHasBeenInserted(String contact) {
 			if(mListView != null && mThreadAdapter != null){

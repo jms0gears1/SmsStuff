@@ -47,9 +47,7 @@ public class Utils {
 		System.arraycopy(inbox, 0, mergeList, 0, inbox.length);
 		System.arraycopy(sentbox, 0, mergeList, inbox.length, sentbox.length);
 		
-		List<MessageItem> list = Arrays.asList(mergeList);
-		
-		Collections.sort(list, new Comparator<MessageItem>(){
+		Arrays.sort(mergeList,new Comparator<MessageItem>(){
 			@Override
 			public int compare(MessageItem lhs, MessageItem rhs) {
 				Long lhsDate = Long.valueOf(Long.parseLong(lhs.date));
@@ -58,7 +56,7 @@ public class Utils {
 			}
 		});
 		
-		return list.toArray(new MessageItem[list.size()]);
+		return mergeList;
 	}
 
 	public static boolean isMMS(MessageItem item){

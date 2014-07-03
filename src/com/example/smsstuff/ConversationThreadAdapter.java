@@ -1,10 +1,5 @@
 package com.example.smsstuff;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -146,6 +141,7 @@ public class ConversationThreadAdapter extends BaseAdapter{
 					cursor.close();
 				}else{
 					messages = inboxMessages;
+					setData(messages);
 					cursor.close();
 				}
 				break;
